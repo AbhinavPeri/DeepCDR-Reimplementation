@@ -42,20 +42,24 @@ class Conv1DConfig:
 
 
 class FCConfig:
-    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], use_bn=True):
+    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], output=None, p_dropout=0, use_bn=True):
+        assert len(activations) == len(n_neurons)
         self.n_neurons = n_neurons
         self.activations = activations
+        self.output = output
+        self.p_dropout = p_dropout
         self.use_bn = use_bn
 
 
 class DeepCDRConfig:
     def __init__(self, drug_config: GNNConfig, mutation_config: Conv1DConfig, g_expr_config: FCConfig,
-                 meth_config: FCConfig, regression_conv1d: Conv1DConfig):
+                 meth_config: FCConfig, regression_conv1d: Conv1DConfig, regression_fc: FCConfig):
         self.drug_config = drug_config
         self.mutation_config = mutation_config
         self.g_expr_config = g_expr_config
         self.meth_config = meth_config
         self.regression_conv1d = regression_conv1d
+        self.regression_fc = regression_fc
 
 
 class NeededFiles:

@@ -18,7 +18,7 @@ def create_1d_cnn_block(in_channels, out_channels, kernel_size, activation: Acti
     layers = [nn.Conv1d(in_channels, out_channels, kernel_size), activation.value(), nn.MaxPool1d(pool_window)]
     if use_bn:
         layers.append(nn.BatchNorm1d(out_channels))
-    # layers.append(nn.Dropout(0))
+    layers.append(nn.Dropout(0.3))
     return nn.Sequential(*layers)
 
 
@@ -38,13 +38,16 @@ def create_1d_cnn(config: Conv1DConfig):
 def create_fcn(config: FCConfig):
     n_neurons = config.n_neurons
     activations = config.activations
+    output = config.output
     layers = []
     for i in range(len(activations)):
-        layers.append(nn.Linear(n_neurons[i], n_neurons[i + 1]))
-        if config.use_bn:
-            layers.append(nn.BatchNorm1d(n_neurons[i + 1]))
+        layers.append(nn.LazyLinear(n_neurons[i]))
         layers.append(activations[i].value())
-        # layers.append(nn.Dropout(0))
+        if config.use_bn:
+            layers.append(nn.BatchNorm1d(n_neurons[i]))
+        layers.append(nn.Dropout(config.p_dropout))
+    if output:
+        layers.append(nn.LazyLinear(output))
     return nn.Sequential(*layers)
 
 

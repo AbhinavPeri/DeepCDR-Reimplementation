@@ -33,15 +33,13 @@ class DeepCDRDataModule(pl.LightningDataModule):
         self.full_dataset = DeepCDRDataset(self.raw_files, self.max_atoms)
         self.n_batches = len(self.full_dataset) // self.batch_size
         assert self.n_batches >= 3
-        self.n_val = 1 + self.batch_size * (15 * (self.n_batches - 3)) // 100
-        self.n_test = self.n_val
-        self.test_dataset = self.full_dataset[:self.n_test]
-        self.val_dataset = self.full_dataset[self.n_test:self.n_val]
-        self.train_dataset = self.full_dataset[self.n_val:]
+        self.n_val = self.batch_size * (1 + (15 * (self.n_batches - 3) // 100))
+        self.test_dataset = self.full_dataset[:self.n_val]
+        self.val_dataset = self.full_dataset[self.n_val:2 * self.n_val]
+        self.train_dataset = self.full_dataset[2 * self.n_val:]
 
     def get_debug_batch(self):
         self.prepare_data()
-        self.setup(stage='fit')
         return next(iter(self.train_dataloader()))
 
     def train_dataloader(self) -> TRAIN_DATALOADERS:

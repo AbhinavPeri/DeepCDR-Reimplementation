@@ -21,5 +21,5 @@ class GNNBlock(nn.Module):
         z = self.activation_func(z)
         if self.use_bn:
             z = self.bn(z)
-        #  = F.dropout(z, 0, training=self.training)
+        z = F.dropout(z, 0.3, training=self.training)
         return z.type_as(x)
