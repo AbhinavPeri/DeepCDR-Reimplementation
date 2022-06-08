@@ -1,0 +1,6 @@
+# Ignore large files
+data/raw/GDSC/drug_graph_feat
+data/preprocessed/preloaded_data.hkl
+
+# Ignore test files
+test.ipynb

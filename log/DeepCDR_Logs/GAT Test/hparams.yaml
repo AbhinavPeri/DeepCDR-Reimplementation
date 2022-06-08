@@ -1,0 +1,83 @@
+config: !!python/object:util.config.DeepCDRConfig
+  drug_config: !!python/object:util.config.GNNConfig
+    activations:
+    - &id001 !!python/name:None.relu ''
+    - *id001
+    - *id001
+    conv_layers:
+    - 75
+    - 256
+    - 256
+    - 256
+    gnn_types:
+    - &id002 !!python/object/apply:util.config.ConvType
+      - !!python/name:torch_geometric.nn.conv.gat_conv.GATConv ''
+    - *id002
+    - *id002
+    p_dropout: 0.1
+    use_bn: false
+  g_expr_config: !!python/object:util.config.FCConfig
+    activations:
+    - &id003 !!python/object/apply:util.config.ActivationFunc
+      - !!python/name:torch.nn.modules.activation.Tanh ''
+    n_neurons:
+    - 256
+    output: 100
+    p_dropout: 0.1
+    use_bn: false
+  meth_config: !!python/object:util.config.FCConfig
+    activations:
+    - *id003
+    n_neurons:
+    - 256
+    output: 100
+    p_dropout: 0.1
+    use_bn: false
+  mutation_config: !!python/object:util.config.Conv1DConfig
+    activations:
+    - *id003
+    - &id004 !!python/object/apply:util.config.ActivationFunc
+      - !!python/name:torch.nn.modules.activation.ReLU ''
+    k_sizes:
+    - 700
+    - 5
+    n_channels:
+    - 1
+    - 5
+    - 10
+    p_dropout: 0.1
+    pool_windows:
+    - 10
+    - 10
+    use_bn: false
+  regression_conv1d: !!python/object:util.config.Conv1DConfig
+    activations:
+    - *id004
+    - *id004
+    - *id004
+    - *id004
+    k_sizes:
+    - 150
+    - 5
+    - 5
+    - 5
+    n_channels:
+    - 1
+    - 10
+    - 5
+    - 5
+    - 5
+    p_dropout: 0.1
+    pool_windows:
+    - 2
+    - 3
+    - 3
+    - 3
+    use_bn: false
+  regression_fc: !!python/object:util.config.FCConfig
+    activations: []
+    n_neurons: []
+    output: 1
+    p_dropout: 0.1
+    use_bn: false
+lr: 0.005
