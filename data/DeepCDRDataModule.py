@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import numpy as np
 import csv
@@ -6,8 +7,9 @@ import hickle as hkl
 import pandas as pd
 import torch
 from pytorch_lightning.utilities.types import TRAIN_DATALOADERS, EVAL_DATALOADERS
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Subset, random_split
 from torch_geometric.data import Data
+from torchvision.datasets import MNIST
 from torch_geometric.loader import DataLoader
 import pytorch_lightning as pl
 
@@ -17,38 +19,41 @@ from util.utils import normalized_adj
 
 class DeepCDRDataModule(pl.LightningDataModule):
 
-    def __init__(self, raw_files: NeededFiles, max_atoms: int, batch_size=32):
+    def __init__(self, data_dir: str, max_atoms: int, batch_size=32, generate_data=False):
         super().__init__()
         self.train_dataset, self.val_dataset, self.test_dataset = [None, None, None]
-        self.raw_files = raw_files
+        self.raw_files = NeededFiles(data_dir)
         self.max_atoms = max_atoms
         self.batch_size = batch_size
-        self.n_batches = None
+        self.generate_data=generate_data
         self.full_dataset = None
-        self.n_val = None
-        self.n_test = None
-
+    
     def prepare_data(self) -> None:
-        self.full_dataset = DeepCDRDataset(self.raw_files, self.max_atoms)
-        self.n_batches = len(self.full_dataset) // self.batch_size
-        assert self.n_batches >= 3
-        self.n_val = self.batch_size * (1 + (15 * (self.n_batches - 3) // 100))
-        self.test_dataset = self.full_dataset[:self.n_val]
-        self.val_dataset = self.full_dataset[self.n_val:2 * self.n_val]
-        self.train_dataset = self.full_dataset[2 * self.n_val:]
+        DeepCDRDataset(self.raw_files, self.max_atoms)
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        self.full_dataset = DeepCDRDataset(self.raw_files, self.max_atoms) if self.full_dataset == None else self.full_dataset
+        n_batches = len(self.full_dataset) // self.batch_size
+        assert n_batches >= 3, "The batch size is too large resulting in too few batches for training, testing, and validation data loaders"
+        n_val = self.batch_size * (1 + (5 * (n_batches - 3) // 100))
+        n_train = len(self.full_dataset) - n_val * 2
+        if stage == 'fit':
+            self.train_dataset, self.val_dataset = random_split(Subset(self.full_dataset, np.arange(n_train + n_val)), [n_train, n_val])
+        if stage == 'test':
+            self.test_dataset = self.full_dataset[n_train + n_val:]
 
     def get_debug_batch(self):
         self.prepare_data()
         return next(iter(self.train_dataloader()))
 
     def train_dataloader(self) -> TRAIN_DATALOADERS:
-        return DataLoader(self.train_dataset, self.batch_size, shuffle=True, num_workers=16, drop_last=True)
+        return DataLoader(self.train_dataset, self.batch_size, shuffle=True, num_workers=64, drop_last=True)
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
-        return DataLoader(self.val_dataset, self.batch_size, shuffle=False, num_workers=16, drop_last=True)
+        return DataLoader(self.val_dataset, self.batch_size, shuffle=False, num_workers=64, drop_last=True)
 
     def test_dataloader(self) -> EVAL_DATALOADERS:
-        return DataLoader(self.test_dataset, self.batch_size, shuffle=False, num_workers=16, drop_last=True)
+        return DataLoader(self.test_dataset, self.batch_size, shuffle=False, num_workers=64, drop_last=True)
 
 
 class DeepCDRDataset(Dataset):
@@ -61,23 +66,20 @@ class DeepCDRDataset(Dataset):
         if not os.listdir(path='data/preprocessed') or generate_data:
             self.process()
         else:
-            self.data = hkl.load(
-                'data/preprocessed/preloaded_data.hkl')
+            self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = torch.load('data/preprocessed/data.pt')
+            
 
     def process(self):
         mutation_feature, drug_feature, gexpr_feature, methylation_feature, data_idx = self.metadata_generate(False)
         # Extract features for training and test
-        drug_data, mutation_data, gexpr_data, methylation_data, ic50_scores = self.feature_extract(data_idx[:100], drug_feature, mutation_feature, gexpr_feature, methylation_feature)
-        self.data = []
-        for i in range(len(drug_data)):
-            self.data.append([drug_data[i], mutation_data[i], gexpr_data[i], methylation_data[i], ic50_scores[i]])
-        hkl.dump(self.data, open('data/preprocessed/preloaded_data.hkl', 'w'))
+        self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = self.feature_extract(data_idx, drug_feature, mutation_feature, gexpr_feature, methylation_feature)
+        torch.save((self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores), 'data/preprocessed/data.pt')
 
     def __getitem__(self, idx):
-        return self.data[idx]
+        return self.drug_data[idx], self.mutation_data[idx], self.gexpr_data[idx], self.methylation_data[idx], self.ic50_scores[idx]
 
     def __len__(self):
-        return len(self.data)
+        return len(self.drug_data)
 
     def metadata_generate(self, filtered):
         # drug_id --> pubchem_id

@@ -5,43 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddff1a79-4b20-47f9-911e-458665f83b50" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/DeepCDR.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DeepCDR.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/.ipynb_checkpoints/DeepCDRTest-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/DeepCDRTest-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/DeepCDRTest.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/DeepCDRTest.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/data/DeepCDRDataModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/DeepCDRDataModule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/data/Preprocessed/preloaded_data.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/models/DeepCDRLitModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/DeepCDRLitModule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/models/GNNModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/GNNModel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/util/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reimplementation/util/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoint/best_DeepCDR_with_mut_with_gexp_with_methy_256_256_256_bn_relu_GAP.h5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoint/readme.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/223drugs_pubchem_smiles.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/223drugs_pubchem_smiles.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/Cell_lines_annotations_20181226.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/Cell_lines_annotations_20181226.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/GDSC_IC50.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/GDSC_IC50.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/IC50_thred.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/IC50_thred.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/genomic_copynumber_561celllines_710genes_demap_features.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/genomic_copynumber_561celllines_710genes_demap_features.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/genomic_expression_561celllines_697genes_demap_features.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/genomic_expression_561celllines_697genes_demap_features.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/genomic_methylation_561celllines_808genes_demap_features.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/genomic_methylation_561celllines_808genes_demap_features.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/CCLE/genomic_mutation_34673_demap_features.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/CCLE/genomic_mutation_34673_demap_features.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/GDSC/1.Drug_listMon Jun 24 09_00_55 2019.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/GDSC/1.Drug_listMon Jun 24 09_00_55 2019.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/GDSC/drug_graph_feat.zip" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/GDSC/drug_graph_feat.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Missing_data_pre/records_pre_all.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/Missing_data_pre/records_pre_all.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/anti_drug.info" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/anti_drug.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/cancer_cell_line.info" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/cancer_cell_line.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/model.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/layers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/layers/graph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/model.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/process_drug.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/run_DeepCDR.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/run_DeepCDR_classify.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prog/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DeepCDRTest.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/DeepCDRTest.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/DeepCDRDataModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/DeepCDRDataModule.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/preprocessed/preloaded_data.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GAT Test/checkpoints/epoch=8-step=54.ckpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GAT Test/events.out.tfevents.1654645310.ubuntu.361273.1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GAT Test/hparams.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/log/DeepCDR_Logs/GAT Test/hparams.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GCN Test/checkpoints/epoch=12-step=78.ckpt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GCN Test/events.out.tfevents.1654645012.ubuntu.361273.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/log/DeepCDR_Logs/GCN Test/hparams.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/DeepCDRLitModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/DeepCDRLitModule.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/test.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/config.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,19 +45,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/user/PycharmProjects/DeepCDR/Reimplementation/GNNModel.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "coverage"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/user/PycharmProjects/DeepCDR/Reimplementation/GNNModel.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;coverage&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -165,6 +143,10 @@
       <workItem from="1654230614543" duration="4230000" />
       <workItem from="1654234969708" duration="5777000" />
       <workItem from="1654635899805" duration="9957000" />
+      <workItem from="1655759223504" duration="302000" />
+      <workItem from="1655759561888" duration="976000" />
+      <workItem from="1655761670290" duration="90000" />
+      <workItem from="1655763101279" duration="732000" />
     </task>
     <servers />
   </component>

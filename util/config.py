@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 from typing import List
 
 import torch
@@ -7,23 +7,17 @@ import torch_geometric
 from torch_geometric.nn import GCNConv, GATConv
 
 
-class ConvType(Enum):
-    GCN = GCNConv
-    GAT = GATConv
+class ConvType(IntEnum):
+    GCN = 0
+    GAT = 1
 
-
-class FuncActivationFunc:
-    ReLU = torch.relu
-    Tanh = torch.tanh
-
-
-class ActivationFunc(Enum):
-    ReLU = nn.ReLU
-    Tanh = nn.Tanh
+class ActivationFunc(IntEnum):
+    ReLU = 0
+    Tanh = 1
 
 
 class GNNConfig:
-    def __init__(self, conv_layers: List[int], gnn_types: List[ConvType], activations: List[FuncActivationFunc],
+    def __init__(self, conv_layers: List[int], gnn_types: List[ConvType], activations: List[ActivationFunc],
                  p_dropout=0, use_bn=False):
         self.conv_layers = conv_layers
         self.gnn_types = gnn_types
@@ -75,14 +69,20 @@ class DeepCDRConfig:
         self.meth_config = meth_config
         self.regression_conv1d = regression_conv1d
         self.regression_fc = regression_fc
-
+    
+    def to_dict(self):
+        result = {}
+        for variable, value in vars(self).items():
+            for sub_variable, sub_value in vars(value).items():
+                result[variable + "_" + sub_variable] = sub_value
+        return result
 
 class NeededFiles:
-    def __init__(self, drg_info, cell_ln_info, drg_features, gene_mutation, cancer_resp, gene_exp, meth):
-        self.drg_info = drg_info
-        self.cell_ln_info = cell_ln_info
-        self.drg_features = drg_features
-        self.gene_mutation = gene_mutation
-        self.cancer_resp = cancer_resp
-        self.gene_exp = gene_exp
-        self.meth = meth
+    def __init__(self, data_dir: str):
+        self.drg_info = '%s/GDSC/1.Drug_listMon Jun 24 09_00_55 2019.csv' % data_dir
+        self.cell_ln_info = '%s/CCLE/Cell_lines_annotations_20181226.txt' % data_dir
+        self.drg_features = '%s/GDSC/drug_graph_feat' % data_dir
+        self.gene_mutation = '%s/CCLE/genomic_mutation_34673_demap_features.csv' % data_dir
+        self.cancer_resp = '%s/CCLE/GDSC_IC50.csv' % data_dir
+        self.gene_exp = '%s/CCLE/genomic_expression_561celllines_697genes_demap_features.csv' % data_dir
+        self.meth = '%s/CCLE/genomic_methylation_561celllines_808genes_demap_features.csv' % data_dir

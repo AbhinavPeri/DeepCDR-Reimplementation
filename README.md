@@ -18,19 +18,8 @@ mutation data is fed through a 1D convolutional neural network, and the gene exp
 through independent fully connected neural networks. After extracting features from all the networks, these features 
 are concatenated and sent to a 1D convolutional neural network followed by a fully connected layer for regression. 
 
-# Results
+# Setup/Hyperparameter Tuning
 
-For these experiments, the same model architecture was used except using a GAT vs GCN structure for the drug encoder.
-The training, validation, and test losses are shown below.
-
-| Model               | MSE Loss |
-|---------------------|----------|
-| GCN Augmented Model | 1.15     |
-| GAT Augmented Model | 1.08     |
-
-
-### Training Loss
-![Training Loss](Images/Train%20Loss.png)
-
-### Validation Loss
-![Validation Loss](Images/Validation%20Loss.png)
+1. Install the relevant libraries with the requirements.txt
+2. Run python tools/hp_finder.py
+3. Add --use_gpu flag if you wan to run hyperparameter tuning using the gpu

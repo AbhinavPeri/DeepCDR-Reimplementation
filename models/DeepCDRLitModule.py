@@ -22,11 +22,11 @@ class DeepCDRLitModule(pl.LightningModule):
         self.regression_fc = create_fcn(config.regression_fc)
         self.config = config
         self.lr = lr
-        self.example_input_array = [[Batch.from_data_list(
-            [Data(x=torch.randn(100, config.drug_config.conv_layers[0]),
-                  edge_index=torch.randint(0, 100, (2, 101)).long())]),
-            torch.randn(1, 1, 34673), torch.randn(1, 697),
-            torch.randn(1, 808), torch.randn(1)]]
+        fake_data = Data(x=torch.randn(100, 75), edge_index=torch.randint(0, 100, (2, 101)).long())
+        self.example_input_array = [[Batch.from_data_list([fake_data, fake_data]),
+            torch.randn(2, 1, 34673), torch.randn(2, 697),
+            torch.randn(2, 808), torch.randn(2)]]
+        self.forward(*self.example_input_array)
         self.save_hyperparameters()
 
     def configure_optimizers(self):
@@ -54,7 +54,8 @@ class DeepCDRLitModule(pl.LightningModule):
         drug_data, _, _, _, ic50_scores = batch
         prediction = self.forward(batch)
         loss = F.mse_loss(prediction, ic50_scores)
-        self.log(stage + " loss", loss, prog_bar=True, batch_size=drug_data.num_graphs)
+        self.log(stage + " loss", loss, prog_bar=True, batch_size=drug_data.num_graphs, sync_dist=True)
+        self.log('hp_metric', loss, batch_size=drug_data.num_graphs)
         return loss
 
     def training_step(self, batch, batch_idx):
