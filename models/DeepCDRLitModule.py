@@ -4,8 +4,9 @@ import torch.nn as nn
 import pytorch_lightning as pl
 
 from torch_geometric.data import Data, Batch
+from torch_geometric.nn import global_max_pool
 
-from util.config import DeepCDRConfig
+from util.config import ActivationFunc, DeepCDRConfig, FCConfig
 from util.utils import create_1d_cnn, create_fcn, create_gnn
 
 
@@ -13,8 +14,10 @@ class DeepCDRLitModule(pl.LightningModule):
     def __init__(self, config: DeepCDRConfig, lr=0.005):
         super(DeepCDRLitModule, self).__init__()
         self.drug_gnn = create_gnn(config.drug_config)
+        self.drug_fc = create_fcn(FCConfig([1024], [ActivationFunc.ReLU], output=128, p_dropout=0.2, use_bn=True))
         self.mutation_cnn1d = create_1d_cnn(config.mutation_config)
         self.mutation_cnn1d.append(nn.Flatten()).append(nn.LazyLinear(100))
+        self.mutation_fc = create_fcn(FCConfig([], [], output=100, p_dropout=0.2, use_bn=True))
         self.g_expr_fcn = create_fcn(config.g_expr_config)
         self.meth_fcn = create_fcn(config.meth_config)
         self.regression_conv1d = create_1d_cnn(config.regression_conv1d)
@@ -39,8 +42,17 @@ class DeepCDRLitModule(pl.LightningModule):
         # Unpack the raw and send it through the different networks
         drug_data, mutation_data, g_expr_data, meth_data, _ = data
         x_drug = self.drug_gnn(drug_data.x, drug_data.edge_index)
-        x_drug = x_drug.reshape(drug_data.num_graphs, -1)
+        # x_drug = x_drug.reshape(drug_data.num_graphs, -1)
+
+        # Global max pooling and linear layers for the drug gcn
+        x_drug = global_max_pool(x_drug, drug_data.batch)
+        x_drug = self.drug_fc(x_drug)
+
         x_mutation = self.mutation_cnn1d(mutation_data)
+
+        # Linear Layers for the mutation features
+        x_mutation = self.mutation_fc(x_mutation)
+
         x_g_expr = self.g_expr_fcn(g_expr_data)
         x_meth = self.meth_fcn(meth_data)
 

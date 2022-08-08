@@ -38,7 +38,7 @@ class Conv1DConfig:
 
 
 class FCConfig:
-    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], output=None, p_dropout=0, use_bn=False):
+    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], output=None, p_dropout=0.0, use_bn=False):
         assert len(activations) == len(n_neurons)
         self.n_neurons = n_neurons
         self.activations = activations

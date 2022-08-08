@@ -22,25 +22,23 @@ class DeepCDRDataModule(pl.LightningDataModule):
     def __init__(self, data_dir: str, max_atoms: int, batch_size=32, generate_data=False):
         super().__init__()
         self.train_dataset, self.val_dataset, self.test_dataset = [None, None, None]
-        self.raw_files = NeededFiles(data_dir)
+        self.data_dir = data_dir
         self.max_atoms = max_atoms
         self.batch_size = batch_size
         self.generate_data=generate_data
         self.full_dataset = None
     
     def prepare_data(self) -> None:
-        DeepCDRDataset(self.raw_files, self.max_atoms)
+        DeepCDRDataset(self.data_dir, self.max_atoms)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        self.full_dataset = DeepCDRDataset(self.raw_files, self.max_atoms) if self.full_dataset == None else self.full_dataset
-        n_batches = len(self.full_dataset) // self.batch_size
-        assert n_batches >= 3, "The batch size is too large resulting in too few batches for training, testing, and validation data loaders"
-        n_val = self.batch_size * (1 + (5 * (n_batches - 3) // 100))
-        n_train = len(self.full_dataset) - n_val * 2
-        if stage == 'fit':
-            self.train_dataset, self.val_dataset = random_split(Subset(self.full_dataset, np.arange(n_train + n_val)), [n_train, n_val])
-        if stage == 'test':
-            self.test_dataset = self.full_dataset[n_train + n_val:]
+        if not (self.train_dataset and self.val_dataset and self.test_dataset):
+            self.full_dataset = DeepCDRDataset(self.data_dir, self.max_atoms) if self.full_dataset == None else self.full_dataset
+            n_batches = len(self.full_dataset) // self.batch_size
+            assert n_batches >= 3, "The batch size is too large resulting in too few batches for training, testing, and validation data loaders"
+            n_val = self.batch_size * (1 + (10 * (n_batches - 3) // 100))
+            n_train = len(self.full_dataset) - n_val * 2
+            self.train_dataset, self.val_dataset, self.test_dataset = random_split(self.full_dataset, [n_train, n_val, n_val])
 
     def get_debug_batch(self):
         self.prepare_data()
@@ -55,15 +53,19 @@ class DeepCDRDataModule(pl.LightningDataModule):
     def test_dataloader(self) -> EVAL_DATALOADERS:
         return DataLoader(self.test_dataset, self.batch_size, shuffle=False, num_workers=64, drop_last=True)
 
+    def predict_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(self.test_dataset, self.batch_size, shuffle=False, num_workers=64, drop_last=True)
+
 
 class DeepCDRDataset(Dataset):
 
-    def __init__(self, raw_files: NeededFiles, max_atoms: int, generate_data=False):
+    def __init__(self, data_dir: str, max_atoms: int, generate_data=False):
         super().__init__()
         self.data = None
-        self.raw_files = raw_files
+        self.data_dir = data_dir
+        self.raw_files = NeededFiles(self.data_dir + '/raw')
         self.max_atoms = max_atoms
-        if not os.listdir(path='data/preprocessed') or generate_data:
+        if not os.listdir(path=self.data_dir + '/preprocessed') or generate_data:
             self.process()
         else:
             self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = torch.load('data/preprocessed/data.pt')
@@ -73,7 +75,7 @@ class DeepCDRDataset(Dataset):
         mutation_feature, drug_feature, gexpr_feature, methylation_feature, data_idx = self.metadata_generate(False)
         # Extract features for training and test
         self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = self.feature_extract(data_idx, drug_feature, mutation_feature, gexpr_feature, methylation_feature)
-        torch.save((self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores), 'data/preprocessed/data.pt')
+        torch.save((self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores), self.data_dir + '/preprocessed/data.pt')
 
     def __getitem__(self, idx):
         return self.drug_data[idx], self.mutation_data[idx], self.gexpr_data[idx], self.methylation_data[idx], self.ic50_scores[idx]

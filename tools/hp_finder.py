@@ -7,13 +7,16 @@ from argparse import ArgumentParser
 from data.DeepCDRDataModule import DeepCDRDataModule
 from models.DeepCDRLitModule import DeepCDRLitModule
 from util.config import NeededFiles
-from util.utils import config_from_trial, get_preset_config
+from util.utils import config_from_trial
+
+
+import torch
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 import pytorch_lightning as pl
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 from pytorch_lightning.callbacks import RichModelSummary, RichProgressBar
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from pytorch_lightning.plugins import DDPPlugin
 
 import optuna
 from optuna.trial import Trial
@@ -36,13 +39,21 @@ def objective(trial: Trial):
     return trainer.callback_metrics["Validation loss"].item()
 
 
+def tune(n_trials, save_path, load_path=None):
+    pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner(n_warmup_steps=15)
+    if load_path:
+        study = joblib.load(load_path)
+    else: 
+        study = optuna.create_study(direction="minimize", pruner=pruner)
+    study.optimize(objective, n_trials=n_trials)
+    joblib.dump(study, save_path)
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--use_gpu", help="Tune Hyperparameters on the GPU",
                     action="store_true")
     args = parser.parse_args()
-    data = DeepCDRDataModule('data/raw', 100, batch_size=1000)
-    pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner(n_warmup_steps=15)
-    study = joblib.load('hp_tune2.pkl') # optuna.create_study(direction="minimize", pruner=pruner)
-    study.optimize(objective, n_trials=50)
-    joblib.dump(study, 'hp_tune3.pkl')
+    data = DeepCDRDataModule('data', 100, batch_size=1000)
+    tune(100, 'Optuna Trials/hp_tune7.pkl', load_path='Optuna Trials/hp_tune6.pkl')
+    

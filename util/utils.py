@@ -120,15 +120,54 @@ def config_from_trial(trial: Trial):
     regressor_fc_activations = get_random_choices(trial, 'regressor_fc_activations', [tanh, relu], n_regressor_fc_layers)
     regressor_fc_config = FCConfig(regressor_fc_layers, regressor_fc_activations, output=1)
     
-    config = DeepCDRConfig(drug_config, mutation_config, g_expr_config, meth_config, regressor_cnn_config, regressor_fc_config, p_dropout=0.2, use_bn=False)
+    config = DeepCDRConfig(drug_config, mutation_config, g_expr_config, meth_config, regressor_cnn_config, regressor_fc_config, p_dropout=0.1, use_bn=True)
     return config
 
-def get_preset_config():
-    drug_config = GNNConfig([75, 256, 256, 256], [GCN, GCN, GCN], [relu, relu, relu])
-    mutation_config = Conv1DConfig([1, 5, 10], [700, 5], [tanh, relu], [10, 10])
-    g_expr_config = FCConfig([256], [tanh], output=100)
-    meth_config = FCConfig([256], [tanh], output=100)
-    regressor_cnn_config = Conv1DConfig([1, 10, 5, 5, 5], [150, 5, 5, 5], [relu, relu, relu, relu], [2, 3, 3, 3])
-    regressor_fc_config = FCConfig([], [], output=1)
+def get_config_from_param_dict(params: dict):
+    n_drug_layers = params['n_drug_layers']
+    drug_conv_layers = [params['drug_conv_layers_' + str(i)] for i in range(n_drug_layers)]
+    drug_conv_layers.insert(0, 75)
+    drug_conv_type = params['drug_conv_type']
+    drug_conv_types = [drug_conv_type for i in range(n_drug_layers)]
+    drug_activations = [params['drug_activations_' + str(i)] for i in range(n_drug_layers)]
+    drug_config = GNNConfig(drug_conv_layers, drug_conv_types, drug_activations)
+
+
+    mut_channels = [params['mut_channels_' + str(i)] for i in range(2)]
+    mut_channels.insert(0, 1)
+    mut_activations = [params['mut_activations_' + str(i)] for i in range(2)]
+    mutation_config = Conv1DConfig(mut_channels, [700, 5], mut_activations, [10, 10])
+
+    n_g_expr_layers = params['n_g_expr_layers']
+    g_expr_layers = [params['g_expr_layers_' + str(i)] for i in range(n_g_expr_layers)]
+    g_expr_activations = [params['g_expr_activations_' + str(i)] for i in range(n_g_expr_layers - 1)]
+    g_expr_config = FCConfig(g_expr_layers[:-1], g_expr_activations, output=g_expr_layers[-1])
+
+    n_meth_layers = params['n_meth_layers']
+    meth_layers = [params['meth_layers_' + str(i)] for i in range(n_meth_layers)]
+    meth_activations = [params['meth_activations_' + str(i)] for i in range(n_meth_layers - 1)]
+    meth_config = FCConfig(meth_layers[:-1], meth_activations, output=meth_layers[-1])
+
+
+    regressor_cnn_channels = [params['regressor_cnn_channels_' + str(i)] for i in range(3)]
+    regressor_cnn_channels.insert(0, 1)
+    regressor_cnn_activations = [params['regressor_cnn_activations_' + str(i)] for i in range(3)]
+    regressor_cnn_config = Conv1DConfig(regressor_cnn_channels, [150, 5, 5], regressor_cnn_activations, [3, 3, 3])
+
+    n_regressor_fc_layers = params['n_regressor_fc_layers']
+    regressor_fc_layers = [params['regressor_fc_layers_' + str(i)] for i in range(n_regressor_fc_layers)]
+    regressor_fc_activations = [params['regressor_fc_activations_' + str(i)] for i in range(n_regressor_fc_layers)]
+    regressor_fc_config = FCConfig(regressor_fc_layers, regressor_fc_activations, output=1)
+    
+    config = DeepCDRConfig(drug_config, mutation_config, g_expr_config, meth_config, regressor_cnn_config, regressor_fc_config, p_dropout=0.1, use_bn=True)
+    return params['lr'], params['batch size'], config
+
+def get_tuned_config():
+    drug_config = GNNConfig([75, 128, 512, 128, 512, 128], [GCN, GCN, GCN, GCN, GCN], [tanh, relu, relu, relu, relu])
+    mutation_config = Conv1DConfig([1, 10, 10], [700, 5], [relu, tanh], [10, 10])
+    g_expr_config = FCConfig([64, 128], [relu, tanh], output=128)
+    meth_config = FCConfig([256, 64], [relu, tanh], output=64)
+    regressor_cnn_config = Conv1DConfig([1, 5, 10, 20], [150, 5, 5], [relu, tanh, relu], [3, 3, 3])
+    regressor_fc_config = FCConfig([50, 100, 10], [relu, relu, relu], output=1)
     config = DeepCDRConfig(drug_config, mutation_config, g_expr_config, meth_config, regressor_cnn_config, regressor_fc_config, 0.1, False)
     return config
