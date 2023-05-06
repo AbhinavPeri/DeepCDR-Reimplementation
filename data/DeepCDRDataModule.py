@@ -7,9 +7,8 @@ import hickle as hkl
 import pandas as pd
 import torch
 from pytorch_lightning.utilities.types import TRAIN_DATALOADERS, EVAL_DATALOADERS
-from torch.utils.data import Dataset, Subset, random_split
+from torch.utils.data import Dataset, random_split
 from torch_geometric.data import Data
-from torchvision.datasets import MNIST
 from torch_geometric.loader import DataLoader
 import pytorch_lightning as pl
 
@@ -25,20 +24,24 @@ class DeepCDRDataModule(pl.LightningDataModule):
         self.data_dir = data_dir
         self.max_atoms = max_atoms
         self.batch_size = batch_size
-        self.generate_data=generate_data
+        self.generate_data = generate_data
         self.full_dataset = None
-    
+        self.prepare_data()
+
     def prepare_data(self) -> None:
         DeepCDRDataset(self.data_dir, self.max_atoms)
 
     def setup(self, stage: Optional[str] = None) -> None:
         if not (self.train_dataset and self.val_dataset and self.test_dataset):
-            self.full_dataset = DeepCDRDataset(self.data_dir, self.max_atoms) if self.full_dataset == None else self.full_dataset
+            self.full_dataset = DeepCDRDataset(self.data_dir,
+                                               self.max_atoms) if self.full_dataset is None else self.full_dataset
             n_batches = len(self.full_dataset) // self.batch_size
-            assert n_batches >= 3, "The batch size is too large resulting in too few batches for training, testing, and validation data loaders"
+            assert n_batches >= 3, "The batch size is too large resulting in too few batches for training, testing, " \
+                                   "and validation data loaders"
             n_val = self.batch_size * (1 + (10 * (n_batches - 3) // 100))
             n_train = len(self.full_dataset) - n_val * 2
-            self.train_dataset, self.val_dataset, self.test_dataset = random_split(self.full_dataset, [n_train, n_val, n_val])
+            self.train_dataset, self.val_dataset, self.test_dataset = random_split(self.full_dataset,
+                                                                                   [n_train, n_val, n_val])
 
     def get_debug_batch(self):
         self.prepare_data()
@@ -65,20 +68,24 @@ class DeepCDRDataset(Dataset):
         self.data_dir = data_dir
         self.raw_files = NeededFiles(self.data_dir + '/raw')
         self.max_atoms = max_atoms
-        if not os.listdir(path=self.data_dir + '/preprocessed') or generate_data:
+        if 'preprocessed' not in os.listdir(path=self.data_dir) or generate_data:
             self.process()
         else:
-            self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = torch.load('data/preprocessed/data.pt')
-            
+            self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = torch.load(
+                'data/preprocessed/data.pt')
 
     def process(self):
         mutation_feature, drug_feature, gexpr_feature, methylation_feature, data_idx = self.metadata_generate(False)
         # Extract features for training and test
-        self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = self.feature_extract(data_idx, drug_feature, mutation_feature, gexpr_feature, methylation_feature)
-        torch.save((self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores), self.data_dir + '/preprocessed/data.pt')
+        self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores = self.feature_extract(
+            data_idx, drug_feature, mutation_feature, gexpr_feature, methylation_feature)
+        os.makedirs(self.data_dir + '/preprocessed', exist_ok=True)
+        torch.save((self.drug_data, self.mutation_data, self.gexpr_data, self.methylation_data, self.ic50_scores),
+                   self.data_dir + '/preprocessed/data.pt')
 
     def __getitem__(self, idx):
-        return self.drug_data[idx], self.mutation_data[idx], self.gexpr_data[idx], self.methylation_data[idx], self.ic50_scores[idx]
+        return self.drug_data[idx], self.mutation_data[idx], self.gexpr_data[idx], self.methylation_data[idx], \
+            self.ic50_scores[idx]
 
     def __len__(self):
         return len(self.drug_data)

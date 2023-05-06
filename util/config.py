@@ -11,6 +11,7 @@ class ConvType(IntEnum):
     GCN = 0
     GAT = 1
 
+
 class ActivationFunc(IntEnum):
     ReLU = 0
     Tanh = 1
@@ -38,7 +39,8 @@ class Conv1DConfig:
 
 
 class FCConfig:
-    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], output=None, p_dropout=0.0, use_bn=False):
+    def __init__(self, n_neurons: List[int], activations: List[ActivationFunc], output=None, p_dropout=0.0,
+                 use_bn=False):
         assert len(activations) == len(n_neurons)
         self.n_neurons = n_neurons
         self.activations = activations
@@ -69,13 +71,14 @@ class DeepCDRConfig:
         self.meth_config = meth_config
         self.regression_conv1d = regression_conv1d
         self.regression_fc = regression_fc
-    
+
     def to_dict(self):
         result = {}
         for variable, value in vars(self).items():
             for sub_variable, sub_value in vars(value).items():
                 result[variable + "_" + sub_variable] = sub_value
         return result
+
 
 class NeededFiles:
     def __init__(self, data_dir: str):
